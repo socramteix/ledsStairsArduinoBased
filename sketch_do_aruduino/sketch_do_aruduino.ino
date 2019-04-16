@@ -9,6 +9,7 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 Adafruit_PWMServoDriver board2 = Adafruit_PWMServoDriver(0x41);
 Adafruit_PWMServoDriver board3 = Adafruit_PWMServoDriver(0x42);
 //comentario 2
+int sensorValue;
 int sensorPin = A0;
 int recvPin = 8; // IR Receiver - Arduino Pin Number 8
 int redPin = 2; // RED Output Pin
@@ -23,7 +24,7 @@ unsigned long previousMillis = 0; // variable for the delay function
 // our servo # counter
 uint8_t servonum = 0;
 char inChar = '0';
-int cont=-1;
+int cont=0;
 
 //as linhas sao os degraus e as colunas as cores R, G e B
 int degraus[16][3] = {
@@ -104,9 +105,9 @@ unsigned long currentMillis;
 void setup() {
   Serial.begin(9600);
   irrecv.enableIRIn(); // Start the receiver
-  pinMode(redPin, OUTPUT);
-  pinMode(greenPin, OUTPUT);
-  pinMode(bluePin, OUTPUT);
+  pinMode(redPin   , OUTPUT);
+  pinMode(greenPin , OUTPUT);
+  pinMode(bluePin  , OUTPUT);
   pinMode(sensorPin, INPUT);
   board1.begin();
   board2.begin();
@@ -206,7 +207,7 @@ void sendColor()
     analogWrite(greenPin, greenComputed);
     analogWrite(bluePin, blueComputed);
 
-    setColor(redComputed,greenComputed,blueComputed);
+    setColorAllSteps(redComputed,greenComputed,blueComputed);
 //    for (uint8_t servonum = 0; servonum < 16; servonum++) {
 //        board1.setPWM(servonum, 0, redComputed);
 //        board2.setPWM(servonum, 0, blueComputed);
@@ -281,7 +282,7 @@ void flash() {
       int mappedGreen = map(green, 0, 255, 0, 4095);
       int mappedBlue = map(blue, 0, 255, 0, 4095);
 
-      setColor(mappedRed,mappedGreen,mappedBlue);
+      setColorAllSteps(mappedRed,mappedGreen,mappedBlue);
 
 //      for (uint8_t servonum = 0; servonum < 16; servonum++) {
 //        board1.setPWM(servonum, 0, mappedRed);
@@ -328,7 +329,7 @@ void strobe() {
         mappedGreen = map(green, 0, 255, 0, 4095);
         mappedBlue = map(blue, 0, 255, 0, 4095);
 
-        setColor(mappedRed,mappedGreen,mappedBlue);
+        setColorAllSteps(mappedRed,mappedGreen,mappedBlue);
         
 //        for (uint8_t servonum = 0; servonum < 16; servonum++) {
 //          board1.setPWM(servonum, 0, mappedRed);
@@ -336,7 +337,7 @@ void strobe() {
 //          board3.setPWM(servonum, 0, mappedBlue);
 //        }
       } else {
-          setColor(0,0,0);
+          setColorAllSteps(0,0,0);
 //          for (uint8_t servonum = 0; servonum < 16; servonum++) {
 //            board1.setPWM(servonum, 0, 0);
 //            board2.setPWM(servonum, 0, 0);
@@ -397,7 +398,7 @@ void fade() {
       mappedGreen = map(mappedGreen, 0, 255, 0, 4095);
       mappedBlue = map(mappedBlue, 0, 255, 0, 4095);
 
-      setColor(mappedRed,mappedGreen,mappedBlue);
+      setColorAllSteps(mappedRed,mappedGreen,mappedBlue);
       
 //      for (uint8_t servonum = 0; servonum < 16; servonum++) {
 //        board1.setPWM(servonum, 0, mappedRed);
@@ -438,7 +439,7 @@ void fade() {
       mappedGreen = map(mappedGreen, 0, 255, 0, 4095);
       mappedBlue = map(mappedBlue, 0, 255, 0, 4095);
 
-      setColor(mappedRed,mappedGreen,mappedBlue);
+      setColorAllSteps(mappedRed,mappedGreen,mappedBlue);
       
 //      for (uint8_t servonum = 0; servonum < 16; servonum++) {
 //        board1.setPWM(servonum, 0, mappedRed);
@@ -526,7 +527,7 @@ void crossFade() {
       analogWrite(redPin, redVal);   // Write current values to LED pins
       analogWrite(greenPin, grnVal);
       analogWrite(bluePin, bluVal);
-      setColor(redVal,grnVal,bluVal);
+      setColorAllSteps(redVal,grnVal,bluVal);
       i++;
       if (i == 257) {
         prevR = redVal;
@@ -540,17 +541,17 @@ void crossFade() {
 
 //manda o numero o valor da posicao (0 a 47) e da intensidade (0 a 4095)
 void setIntensity(int pos, int intensity){
-        if(pos<16){
+        if(pos<=15){
           board1.setPWM(pos, 0, intensity);}
-        else if(cont>15 && cont<32){
+        else if(cont>15 && cont<=31){
           board2.setPWM(pos%16, 0, intensity);}
         else{
           board3.setPWM(pos%32, 0, intensity);}
 }
 
-void setColor(int red, int green, int blue){
+void setColorAllSteps(int red, int green, int blue){
 
-  //para a cor vermelha
+  //seta a posição mapeada (0 a 47) para cada degrau
   for(int j=0;j<16;j++){
       setIntensity(degraus[j][0],red);
       //Serial.print("red: ");
@@ -564,23 +565,24 @@ void setColor(int red, int green, int blue){
   }
 }
 
-//envie 1 para incrementar e outra coisa para reiniciar
 void mapear(){
+  
  while (Serial.available()) {
+  
       inChar = (char)Serial.read();
       Serial.println(inChar);
+      
       if (inChar == '1') {
         for (uint8_t pos = 0; pos < 48; pos++) {
           setIntensity(pos, 0);
         }
-        cont++;
         Serial.println(cont);
         setIntensity(cont, 4095);
+        cont++;
       }
-      else if(inChar == '\n'){}
-      else if(inChar == 'r'){setColor(4095,0,0);}
-      else if(inChar == 'g'){setColor(0,4095,0);}
-      else if(inChar == 'b'){setColor(0,0,4095);}
+      else if(inChar == 'r'){setColorAllSteps(4095,0,0);}
+      else if(inChar == 'g'){setColorAllSteps(0,4095,0);}
+      else if(inChar == 'b'){setColorAllSteps(0,0,4095);}
       else if(inChar == 'a'){
         for (uint8_t servonum = 0; servonum < 16; servonum++) {
           board1.setPWM(servonum, 0, 4095);
@@ -588,6 +590,7 @@ void mapear(){
           board3.setPWM(servonum, 0, 4095);
         }
       }
+      else if(inChar == '\n'){}
       else if(inChar == 'x'){
         for (uint8_t servonum = 0; servonum < 16; servonum++) {
           board1.setPWM(servonum, 0, 0);
@@ -597,12 +600,12 @@ void mapear(){
       }
       else{
         Serial.println("else");
-        cont=-1;
+        cont=0;
       }
   }
 }
 
-void iniciarEscada(){
+void subirEscada(){
   for(int j=0;j<16;j++){
     setIntensity(degraus[j][0],4095);
     setIntensity(degraus[j][1],4095);
@@ -622,9 +625,11 @@ void iniciarEscada(){
 // check for a code from the remote every 100 milliseconds
 void loop() {
   currentMillis = millis();
-  if(analogRead(sensorPin) == 0)
-    iniciarEscada();
-  if (currentMillis - previousMillis >= 100) {
+  sensorValue = analogRead(sensorPin);
+  Serial.println(sensorValue);
+  if(sensorValue < 500)
+    subirEscada();
+  else if (currentMillis - previousMillis >= 100) {
     previousMillis = currentMillis;
     findCode();
   }
