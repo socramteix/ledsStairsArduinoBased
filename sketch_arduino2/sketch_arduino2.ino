@@ -15,56 +15,56 @@ IRrecv irrecv(RECV_PIN);
 decode_results results;
 
 // Defining hex codes for the remote
-#define ON_CODE           0xF7C03F
-#define OFF_CODE          0xF740BF
-#define INTENSITY_UP_CODE 0xF700FF
-#define INTENSITY_DN_CODE 0xF7807F
-#define RED_CODE          0xF720DF
-#define GREEN_CODE        0xF7A05F
-#define BLUE_CODE         0xF7609F
-#define WHITE_CODE        0xF7E01F
-#define ORANGE_CODE       0xF710EF
-#define TURQUOISE_CODE    0xF7906F
-#define NAVY_CODE         0xF750AF
-#define BROWN_CODE        0xF730CF
-#define TEAL_CODE         0xF7B04F
-#define PURPLE_DARK_CODE  0xF7708F
-#define ORANGE_LIGHT_CODE 0xF708F7
-#define BLUE_LIGHT_CODE   0xF78877
-#define PINK_DARK_CODE    0xF748B7
-#define YELLOW_CODE       0xF728D7
-#define BLUE_BABY_CODE    0xF7A857
-#define PINK_CODE         0xF76897
-#define FLASH_CODE        0xF7D02F
-#define STROBE_CODE       0xF7F00F
-#define FADE_CODE         0xF7C837
-#define SMOOTH_CODE       0xF7E817
-#define REPEATED          0xFFFFFFFF
+const long ON_CODE           =0xF7C03F;
+const long OFF_CODE          =0xF740BF;
+const long INTENSITY_UP_CODE =0xF700FF;
+const long INTENSITY_DN_CODE =0xF7807F;
+const long RED_CODE          =0xF720DF;
+const long GREEN_CODE        =0xF7A05F;
+const long BLUE_CODE         =0xF7609F;
+const long WHITE_CODE        =0xF7E01F;
+const long ORANGE_CODE       =0xF710EF;
+const long TURQUOISE_CODE    =0xF7906F;
+const long NAVY_CODE         =0xF750AF;
+const long BROWN_CODE        =0xF730CF;
+const long TEAL_CODE         =0xF7B04F;
+const long PURPLE_DARK_CODE  =0xF7708F;
+const long ORANGE_LIGHT_CODE =0xF708F7;
+const long BLUE_LIGHT_CODE   =0xF78877;
+const long PINK_DARK_CODE    =0xF748B7;
+const long YELLOW_CODE       =0xF728D7;
+const long BLUE_BABY_CODE    =0xF7A857;
+const long PINK_CODE         =0xF76897;
+const long FLASH_CODE        =0xF7D02F;
+const long STROBE_CODE       =0xF7F00F;
+const long FADE_CODE         =0xF7C837;
+const long SMOOTH_CODE       =0xF7E817;
+const long REPEATED          =0xFFFFFFFF;
 
 // defining the avaialble colors one by one
-int BLACK_COLOR[3] = {0, 0, 0};
-int RED_COLOR[3] = {255, 0, 0};
-int GREEN_COLOR[3] = {0, 255, 0};
-int BLUE_COLOR[3] =  {0, 0, 255};
-int WHITE_COLOR[3] = {255, 255, 255};
-int ORANGE_COLOR[3] = {255, 128, 0};
-int TURQUOISE_COLOR[3] = {0, 255, 128};
-int NAVY_COLOR[3] = {0, 76, 153};
-int BROWN_COLOR[3] = {153, 76, 0};
-int TEAL_COLOR[3] = {0, 102, 102};
-int PURPLE_DARK_COLOR[3] = {102, 0, 51};
-int ORANGE_LIGHT_COLOR[3] = {255, 153, 51};
-int BLUE_LIGHT_COLOR[3] = {0, 255, 255};
-int PINK_DARK_COLOR[3] = {255, 0, 128};
-int YELLOW_COLOR[3] = {255, 255, 0};
-int BLUE_BABY_COLOR[3] = {51, 153, 255};
-int PINK_COLOR[3] = {255, 102, 178};
+ long BLACK_COLOR[3] = {0, 0, 0};
+ long RED_COLOR[3] = {255, 0, 0};
+ long GREEN_COLOR[3] = {0, 255, 0};
+ long BLUE_COLOR[3] =  {0, 0, 255};
+ long WHITE_COLOR[3] = {255, 255, 255};
+ long ORANGE_COLOR[3] = {255, 128, 0};
+ long TURQUOISE_COLOR[3] = {0, 255, 128};
+ long NAVY_COLOR[3] = {0, 76, 153};
+ long BROWN_COLOR[3] = {153, 76, 0};
+ long TEAL_COLOR[3] = {0, 102, 102};
+ long PURPLE_DARK_COLOR[3] = {102, 0, 51};
+ long ORANGE_LIGHT_COLOR[3] = {255, 153, 51};
+ long BLUE_LIGHT_COLOR[3] = {0, 255, 255};
+ long PINK_DARK_COLOR[3] = {255, 0, 128};
+ long YELLOW_COLOR[3] = {255, 255, 0};
+ long BLUE_BABY_COLOR[3] = {51, 153, 255};
+ long PINK_COLOR[3] = {255, 102, 178};
 
 // defining all the available remote codes in an array
-int AVAILABLE_CODES[24] = {ON_CODE, OFF_CODE, INTENSITY_UP_CODE, INTENSITY_DN_CODE, RED_CODE, GREEN_CODE, BLUE_CODE, WHITE_CODE, ORANGE_CODE, TURQUOISE_CODE, NAVY_CODE, BROWN_CODE, TEAL_CODE, PURPLE_DARK_CODE, ORANGE_LIGHT_CODE, BLUE_LIGHT_CODE, PINK_DARK_CODE, YELLOW_CODE, BLUE_BABY_CODE, PINK_CODE, FLASH_CODE, FADE_CODE, SMOOTH_CODE, STROBE_CODE};
+long AVAILABLE_CODES[24] = {ON_CODE, OFF_CODE, INTENSITY_UP_CODE, INTENSITY_DN_CODE, RED_CODE, GREEN_CODE, BLUE_CODE, WHITE_CODE, ORANGE_CODE, TURQUOISE_CODE, NAVY_CODE, BROWN_CODE, TEAL_CODE, PURPLE_DARK_CODE, ORANGE_LIGHT_CODE, BLUE_LIGHT_CODE, PINK_DARK_CODE, YELLOW_CODE, BLUE_BABY_CODE, PINK_CODE, FLASH_CODE, FADE_CODE, SMOOTH_CODE, STROBE_CODE};
 
 // defining all the available colors in an array
-int AVAILABLE_COLORS[16][3] = {{255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {255, 255, 255}, {255, 128, 0}, {0, 255, 128}, {0, 76, 153}, {153, 76, 0}, {0, 102, 102}, {102, 0, 51}, {255, 153, 51}, {0, 255, 255}, {255, 0, 127}, {255, 255, 0}, {51, 153, 255}, {255, 102, 158}} ;
+long AVAILABLE_COLORS[16][3] = {{255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {255, 255, 255}, {255, 128, 0}, {0, 255, 128}, {0, 76, 153}, {153, 76, 0}, {0, 102, 102}, {102, 0, 51}, {255, 153, 51}, {0, 255, 255}, {255, 0, 127}, {255, 255, 0}, {51, 153, 255}, {255, 102, 158}} ;
 
 unsigned long currentMillis;
 
@@ -91,8 +91,8 @@ void loop() {
 }
 
 // function for interpreting the incoming code and eighter setting a fixed color or starting a custom loop function
-void interpretRemoteCode(int code) {
-  int randomColor[3] = {random(256), random(256), random(256)};
+void interpretRemoteCode(long code) {
+  long randomColor[3] = {random(256), random(256), random(256)};
   switch (code) {
     case ON_CODE: setColor(randomColor); break;
     case OFF_CODE: setColor(BLACK_COLOR); break;
@@ -122,14 +122,14 @@ void interpretRemoteCode(int code) {
 }
 
 // set the currentColors variable
-void setColor(int colors[]) {
+void setColor(long colors[]) {
   currentColors[0] = colors[0];
   currentColors[1] = colors[1];
   currentColors[2] = colors[2];
 }
 
 // decode remote controll code and if found in the array of available codes interpret it
-void findCode(int code) {
+void findCode(long code) {
 
   if (existsInArray(code, AVAILABLE_CODES, 24)) {
     //Serial.print("Code Found: ");
@@ -149,14 +149,14 @@ void findCode(int code) {
 void sendColor()
 {
   if (customLoop == false) {
-    int red = currentColors[0];
-    int green = currentColors[1];
-    int blue = currentColors[2];
+    long red = currentColors[0];
+    long green = currentColors[1];
+    long blue = currentColors[2];
 
-    int mappedIntensity = map(intensity, 0, 10, 0, 255);
-    int redComputed = map(red, 0, 255, 0, mappedIntensity);
-    int blueComputed = map(blue, 0, 255, 0, mappedIntensity);
-    int greenComputed = map(green, 0, 255, 0, mappedIntensity);
+    long mappedIntensity = map(intensity, 0, 10, 0, 255);
+    long redComputed = map(red, 0, 255, 0, mappedIntensity);
+    long blueComputed = map(blue, 0, 255, 0, mappedIntensity);
+    long greenComputed = map(green, 0, 255, 0, mappedIntensity);
 
     analogWrite(redPin, redComputed); // Sends PWM signal to the Red pin
     analogWrite(greenPin, greenComputed);
@@ -181,7 +181,7 @@ void sendColor()
 }
 
 // helper function to check if a value is present in an array
-int existsInArray(int compareValue, int arrayName[], int arraySize) {
+int existsInArray(long compareValue, long arrayName[], long arraySize) {
   for (int x = 0; x < arraySize; x = x + 1) {
     if (arrayName[x] == compareValue) {
       return true;
