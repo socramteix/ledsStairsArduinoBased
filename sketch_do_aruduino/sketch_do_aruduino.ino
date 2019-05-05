@@ -27,7 +27,7 @@ char inChar = '0';
 int cont=0;
 
 //as linhas sao os degraus e as colunas as cores R, G e B
-int degraus[16][3] = {
+uint8_t degraus[16][3] = {
 {12,33,32},
 {6,5,8},
 {29,28,30},
@@ -540,10 +540,10 @@ void crossFade() {
 }
 
 //manda o numero o valor da posicao (0 a 47) e da intensidade (0 a 4095)
-void setIntensity(int pos, int intensity){
+void setIntensity(uint8_t pos, int intensity){
         if(pos<=15){
           board1.setPWM(pos, 0, intensity);}
-        else if(cont>15 && cont<=31){
+        else if(pos>15 && pos<=31){
           board2.setPWM(pos%16, 0, intensity);}
         else{
           board3.setPWM(pos%32, 0, intensity);}
@@ -560,8 +560,8 @@ void setColorAllSteps(int red, int green, int blue){
       //Serial.print(" green: ");
       //Serial.print(degraus[j][1]);
       setIntensity(degraus[j][2],blue);
-      //Serial.print(" blue: ");
-      //Serial.println(degraus[j][2]);
+      Serial.print(" blue: ");
+      Serial.println(degraus[j][2]);
   }
 }
 
