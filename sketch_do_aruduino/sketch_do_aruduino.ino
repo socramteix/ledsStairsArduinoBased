@@ -11,8 +11,8 @@ Adafruit_PWMServoDriver board3 = Adafruit_PWMServoDriver(0x42);
 //comentario 2
 int sensorValue;
 int sensorPin = A0;
-int recvPin = 8; // IR Receiver - Arduino Pin Number 8
-int redPin = 2; // RED Output Pin
+int recvPin = 2; // IR Receiver - Arduino Pin Number 8
+int redPin = 8; // RED Output Pin
 int greenPin = 3; // GREEN Output Pin
 int bluePin = 4; // BLUE Output Pin
 int intensity = 10; // Intensity variable
@@ -116,7 +116,10 @@ void setup() {
   board1.setPWMFreq(490);  // Analog servos run at ~60 Hz updates
   board2.setPWMFreq(490);
   board3.setPWMFreq(490);
-
+  
+  //interrupão para o controle
+  //attachInterrupt(digitalPinToInterrupt(recvPin), loop, CHANGE);
+  
   delay(10);
 }
 
@@ -217,13 +220,9 @@ void sendColor()
 }
 
 // decode remote controll code and if found in the array of available codes interpret it
-void findCode() {
+boolean findCode() {
   
   if (irrecv.decode(&results)) {
-//    if(results.value == REPEATED){
-//      Serial.println(results.value,HEX);
-//      results.value = last_value;
-//    } //eu que coloquei esse if pra tentar resolver o problema do invalid code
     if (existsInArray(results.value, AVAILABLE_CODES, 24)) {
       Serial.print("Code Found: ");
       Serial.println(results.value,HEX);
@@ -237,7 +236,9 @@ void findCode() {
       Serial.println(results.value,HEX);
     }
     irrecv.resume();
+    return true;
   }
+  else{return false;}
   
 }
 
@@ -560,8 +561,8 @@ void setColorAllSteps(int red, int green, int blue){
       //Serial.print(" green: ");
       //Serial.print(degraus[j][1]);
       setIntensity(degraus[j][2],blue);
-      Serial.print(" blue: ");
-      Serial.println(degraus[j][2]);
+      //Serial.print(" blue: ");
+      //Serial.println(degraus[j][2]);
   }
 }
 
@@ -610,14 +611,23 @@ void subirEscada(){
     setIntensity(degraus[j][0],4095);
     setIntensity(degraus[j][1],4095);
     setIntensity(degraus[j][2],4095);
+    if(findCode())
+      return;
+    delay(100);
+    Serial.print(".");
+  }
+  for(int i=0;i<160;i++){
+    if(findCode())
+      return;
+    Serial.println("16 sec...");
     delay(100);
   }
-  for(int i=0;i<16;i++)
-    delay(1000);
   for(int j=15;j>=0;j--){
     setIntensity(degraus[j][0],0);
     setIntensity(degraus[j][1],0);
     setIntensity(degraus[j][2],0);
+    if(findCode())
+      return;
     delay(100);
   }
 }
@@ -633,6 +643,6 @@ void loop() {
     previousMillis = currentMillis;
     findCode();
   }
-  mapear(); //chame essa funcao para descobrir qual cor esta em cada degrau
+  //mapear(); //chame essa funcao para descobrir qual cor esta em cada degrau
 
 }
