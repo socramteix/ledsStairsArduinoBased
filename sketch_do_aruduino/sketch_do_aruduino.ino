@@ -9,12 +9,19 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 Adafruit_PWMServoDriver board2 = Adafruit_PWMServoDriver(0x41);
 Adafruit_PWMServoDriver board3 = Adafruit_PWMServoDriver(0x42);
 //comentario 2
+int relePin = 52;
+int patamarValue = 0;
+int patamar = 22;
+int patamarRed = A2;
+int patamarGreen = A3;
+int patamarBlue = A4;
 int sensorValue;
+int sensorVcc = A1;
 int sensorPin = A0;
 int recvPin = 2; // IR Receiver - Arduino Pin Number 8
-int redPin = 8; // RED Output Pin
-int greenPin = 3; // GREEN Output Pin
-int bluePin = 4; // BLUE Output Pin
+//int redPin = 8; // RED Output Pin
+//int greenPin = 3; // GREEN Output Pin
+//int bluePin = 4; // BLUE Output Pin
 int intensity = 10; // Intensity variable
 int speedValue = 5; // Speed Variable
 int currentColors[] = {0, 0, 0}; // Current Color outputed variable (black by default)
@@ -28,22 +35,22 @@ int cont=0;
 
 //as linhas sao os degraus e as colunas as cores R, G e B
 uint8_t degraus[16][3] = {
-{12,33,32},
-{6,5,8},
-{29,28,30},
-{38,37,39},
-{41,40,42},
-{22,23,24},
-{4,3,7},
-{45,46,47},
-{14,13,15},
-{44,43,31},
-{25,27,26},
-{0,1,2},
-{19,20,21},
-{34,35,36},
 {17,18,16},
-{11,9,10}};
+{32,12,33},
+{27,26,25},
+{41,40,42},
+{7,4,2},
+{29,30,28},
+{3,1,0},
+{6,8,5},
+{34,36,35},
+{23,22,24},
+{10,11,9},
+{13,15,14},
+{38,37,39},
+{19,21,20},
+{46,47,45},
+{31,44,43}};
 
 IRrecv irrecv(recvPin);
 decode_results results;
@@ -105,10 +112,13 @@ unsigned long currentMillis;
 void setup() {
   Serial.begin(9600);
   irrecv.enableIRIn(); // Start the receiver
-  pinMode(redPin   , OUTPUT);
-  pinMode(greenPin , OUTPUT);
-  pinMode(bluePin  , OUTPUT);
+  pinMode(relePin  , OUTPUT);
   pinMode(sensorPin, INPUT);
+  pinMode(sensorVcc, OUTPUT);
+  pinMode(patamar      , INPUT);
+  pinMode(patamarRed   , OUTPUT);
+  pinMode(patamarGreen , OUTPUT);
+  pinMode(patamarBlue  , OUTPUT);
   board1.begin();
   board2.begin();
   board3.begin();
@@ -116,6 +126,9 @@ void setup() {
   board1.setPWMFreq(490);  // Analog servos run at ~60 Hz updates
   board2.setPWMFreq(490);
   board3.setPWMFreq(490);
+
+  analogWrite(sensorVcc,255);
+  digitalWrite(relePin,HIGH);
   
   //interrupão para o controle
   //attachInterrupt(digitalPinToInterrupt(recvPin), loop, CHANGE);
@@ -206,10 +219,6 @@ void sendColor()
     long blueComputed = map(blue, 0, 255, 0, mappedIntensity);
     long greenComputed = map(green, 0, 255, 0, mappedIntensity);
 
-    analogWrite(redPin, redComputed); // Sends PWM signal to the Red pin
-    analogWrite(greenPin, greenComputed);
-    analogWrite(bluePin, blueComputed);
-
     setColorAllSteps(redComputed,greenComputed,blueComputed);
 //    for (uint8_t servonum = 0; servonum < 16; servonum++) {
 //        board1.setPWM(servonum, 0, redComputed);
@@ -273,11 +282,6 @@ void flash() {
     // every X milliseconds
     if (currentMillis - previousMillis >= mappedSpeed) {
       previousMillis = currentMillis;
-      
-      // send the color variables through the digital ouput pins 
-      analogWrite(redPin, red);
-      analogWrite(greenPin, green);
-      analogWrite(bluePin, blue);
 
       long mappedRed = map(red, 0, 255, 0, 4095);
       long mappedGreen = map(green, 0, 255, 0, 4095);
@@ -323,9 +327,7 @@ void strobe() {
     if (currentMillis - previousMillis >= mappedSpeed) {
       previousMillis = currentMillis;
       if ( (i % 2) == 0) {
-        analogWrite(redPin, red); // Sends PWM signal to the Red pin
-        analogWrite(greenPin, green);
-        analogWrite(bluePin, blue);
+        
         mappedRed = map(red, 0, 255, 0, 4095);
         mappedGreen = map(green, 0, 255, 0, 4095);
         mappedBlue = map(blue, 0, 255, 0, 4095);
@@ -344,9 +346,6 @@ void strobe() {
 //            board2.setPWM(servonum, 0, 0);
 //            board3.setPWM(servonum, 0, 0);
 //          }
-          analogWrite(redPin, 0); // Sends PWM signal to the Red pin
-          analogWrite(greenPin, 0);
-          analogWrite(bluePin, 0);
       }
       i++;
     }
@@ -390,9 +389,6 @@ void fade() {
       long mappedGreen = green != 0 ? map(green, 0, green, 0, mappedGreenIntensity) : 0;
       long mappedBlueIntensity = map(i, 0, 255, 0, blue);
       long mappedBlue = blue != 0 ? map(blue, 0, blue, 0, mappedBlueIntensity) : 0;
-      analogWrite(redPin, mappedRed);
-      analogWrite(greenPin, mappedGreen);
-      analogWrite(bluePin, mappedBlue);
       i++;
       
       mappedRed = map(mappedRed, 0, 255, 0, 4095);
@@ -432,9 +428,6 @@ void fade() {
       long mappedGreen = green != 0 ? map(green, 0, green, 0, mappedGreenIntensity) : 0;
       long mappedBlueIntensity = map(i, 0, 255, 0, blue);
       long mappedBlue = blue != 0 ? map(blue, 0, blue, 0, mappedBlueIntensity) : 0;
-      analogWrite(redPin, mappedRed);
-      analogWrite(greenPin, mappedGreen);
-      analogWrite(bluePin, mappedBlue);
       
       mappedRed = map(mappedRed, 0, 255, 0, 4095);
       mappedGreen = map(mappedGreen, 0, 255, 0, 4095);
@@ -525,9 +518,6 @@ void crossFade() {
       redVal = calculateVal(stepR, redVal, i);
       grnVal = calculateVal(stepG, grnVal, i);
       bluVal = calculateVal(stepB, bluVal, i);
-      analogWrite(redPin, redVal);   // Write current values to LED pins
-      analogWrite(greenPin, grnVal);
-      analogWrite(bluePin, bluVal);
       setColorAllSteps(redVal,grnVal,bluVal);
       i++;
       if (i == 257) {
@@ -547,8 +537,21 @@ void setIntensity(uint8_t pos, int intensity){
         else if(pos>15 && pos<=31){
           board2.setPWM(pos%16, 0, intensity);}
         else{
-          board3.setPWM(pos%32, 0, intensity);}
+            board3.setPWM(pos%32, 0, intensity);}
+  }
+  
+void setPatamar(int red, int green, int blue){
+  analogWrite(patamarRed,red);
+  //Serial.print("red ");
+  //Serial.println(red);
+  analogWrite(patamarRed,green);
+  //Serial.print("green ");
+  //Serial.println(green);
+  analogWrite(patamarRed,blue);
+  //Serial.print("blue ");
+  //Serial.println(blue);
 }
+
 
 void setColorAllSteps(int red, int green, int blue){
 
@@ -563,6 +566,11 @@ void setColorAllSteps(int red, int green, int blue){
       setIntensity(degraus[j][2],blue);
       //Serial.print(" blue: ");
       //Serial.println(degraus[j][2]);
+      Serial.print("aqui: ");
+      Serial.println(map(red,0,4095,0,255));
+      setPatamar(map(red,0,4095,0,255),map(green,0,4095,0,255),map(blue,0,4095,0,255));
+      
+   
   }
 }
 
@@ -611,6 +619,11 @@ void subirEscada(){
     setIntensity(degraus[j][0],4095);
     setIntensity(degraus[j][1],4095);
     setIntensity(degraus[j][2],4095);
+    if(j == 7){
+      delay(100);
+      setPatamar(255,255,255);
+    }
+      
     if(findCode())
       return;
     delay(100);
@@ -626,19 +639,41 @@ void subirEscada(){
     setIntensity(degraus[j][0],0);
     setIntensity(degraus[j][1],0);
     setIntensity(degraus[j][2],0);
+    if(j == 8){
+      delay(100);
+      setPatamar(0,0,0);
+    }
     if(findCode())
       return;
     delay(100);
   }
+  desligarFonte();
+}
+
+void ligarFonte(){
+  digitalWrite(relePin,LOW);
+}
+void desligarFonte(){
+  digitalWrite(relePin,HIGH);
 }
 
 // check for a code from the remote every 100 milliseconds
 void loop() {
   currentMillis = millis();
   sensorValue = analogRead(sensorPin);
-  //Serial.println(sensorValue);
-  if(sensorValue < 500)
+  patamarValue = digitalRead(patamar);
+  Serial.print("sensor: ");
+  Serial.println(sensorValue);
+  //Serial.println(patamarValue);
+  if(patamarValue == 1)
+    setPatamar(255,255,255);
+  else
+    setPatamar(0,0,0);
+    
+  if(sensorValue < 500){
+    ligarFonte();
     subirEscada();
+  }
   else if (currentMillis - previousMillis >= 100) {
     previousMillis = currentMillis;
     findCode();
