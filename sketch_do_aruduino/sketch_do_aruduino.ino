@@ -12,13 +12,14 @@ Adafruit_PWMServoDriver board3 = Adafruit_PWMServoDriver(0x42);
 int relePin = 52;
 int patamarValue = 0;
 int patamar = 22;
-int patamarRed = A2;
-int patamarGreen = A3;
-int patamarBlue = A4;
+int patamarRed = 9;
+int patamarGreen = 10;
+int patamarBlue = 8;
 int sensorValue;
-int sensorVcc = A1;
-int sensorPin = A0;
-int recvPin = 2; // IR Receiver - Arduino Pin Number 8
+int sensorVcc = A0;
+int sensorPin = A1;
+int valorVelhoPatamar = 0;
+int recvPin = A8; // IR Receiver - Arduino Pin Number 8
 //int redPin = 8; // RED Output Pin
 //int greenPin = 3; // GREEN Output Pin
 //int bluePin = 4; // BLUE Output Pin
@@ -27,6 +28,8 @@ int speedValue = 5; // Speed Variable
 int currentColors[] = {0, 0, 0}; // Current Color outputed variable (black by default)
 bool customLoop = false; // Variable telling us we are in a custom animation loop
 unsigned long previousMillis = 0; // variable for the delay function
+bool ligado;
+bool ligadoAnterior;
 
 // our servo # counter
 uint8_t servonum = 0;
@@ -110,6 +113,7 @@ long AVAILABLE_COLORS[16][3] = {{255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {255, 255
 unsigned long currentMillis;
 
 void setup() {
+  
   Serial.begin(9600);
   irrecv.enableIRIn(); // Start the receiver
   pinMode(relePin  , OUTPUT);
@@ -133,37 +137,40 @@ void setup() {
   //interrupão para o controle
   //attachInterrupt(digitalPinToInterrupt(recvPin), loop, CHANGE);
   
-  delay(10);
+  delay(2500); //esperar a fonte receber energia
+
+  ligado = true;
+  ligadoAnterior = false;
 }
 
 // function for interpreting the incoming code and eighter setting a fixed color or starting a custom loop function
 void interpretRemoteCode(long code) {
   long randomColor[3] = {random(256), random(256), random(256)};
   switch (code) {
-    case ON_CODE: setColor(randomColor); break;
-    case OFF_CODE: setColor(BLACK_COLOR); break;
-    case INTENSITY_UP_CODE: raiseIntensity(); break;
-    case INTENSITY_DN_CODE: lowerIntensity(); break;
-    case RED_CODE: setColor(RED_COLOR); break;
-    case GREEN_CODE: setColor(GREEN_COLOR); break;
-    case BLUE_CODE: setColor(BLUE_COLOR); break;
-    case WHITE_CODE: setColor(WHITE_COLOR); break;
-    case ORANGE_CODE: setColor(ORANGE_COLOR); break;
-    case TURQUOISE_CODE: setColor(TURQUOISE_COLOR); break;
-    case NAVY_CODE: setColor(NAVY_COLOR); break;
-    case BROWN_CODE: setColor(BROWN_COLOR); break;
-    case TEAL_CODE: setColor(TEAL_COLOR); break;
-    case PURPLE_DARK_CODE: setColor(PURPLE_DARK_COLOR); break;
-    case ORANGE_LIGHT_CODE: setColor(ORANGE_LIGHT_COLOR); break;
-    case BLUE_LIGHT_CODE: setColor(BLUE_LIGHT_COLOR); break;
-    case PINK_DARK_CODE: setColor(PINK_DARK_COLOR); break;
-    case YELLOW_CODE: setColor(YELLOW_COLOR); break;
-    case BLUE_BABY_CODE: setColor(BLUE_BABY_COLOR); break;
-    case PINK_CODE: setColor(PINK_COLOR); break;
-    case FLASH_CODE: flash(); break;
-    case STROBE_CODE: strobe(); break;
-    case FADE_CODE: fade(); break;
-    case SMOOTH_CODE: crossFade(); break;
+    case ON_CODE: ligado = true; break;
+    case OFF_CODE: efeito_desligando(); ligado = false; break;
+    case INTENSITY_UP_CODE: if(ligado){raiseIntensity();} break;
+    case INTENSITY_DN_CODE: if(ligado){lowerIntensity();} break;
+    case RED_CODE: if(ligado){setColor(RED_COLOR);} break;
+    case GREEN_CODE: if(ligado){setColor(GREEN_COLOR);} break;
+    case BLUE_CODE: if(ligado){setColor(BLUE_COLOR);} break;
+    case WHITE_CODE: if(ligado){setColor(WHITE_COLOR);} break;
+    case ORANGE_CODE: if(ligado){setColor(ORANGE_COLOR);} break;
+    case TURQUOISE_CODE: if(ligado){setColor(TURQUOISE_COLOR);} break;
+    case NAVY_CODE: if(ligado){setColor(NAVY_COLOR);} break;
+    case BROWN_CODE: if(ligado){setColor(BROWN_COLOR);} break;
+    case TEAL_CODE: if(ligado){setColor(TEAL_COLOR);} break;
+    case PURPLE_DARK_CODE: if(ligado){setColor(PURPLE_DARK_COLOR);} break;
+    case ORANGE_LIGHT_CODE: if(ligado){setColor(ORANGE_LIGHT_COLOR);} break;
+    case BLUE_LIGHT_CODE: if(ligado){setColor(BLUE_LIGHT_COLOR);} break;
+    case PINK_DARK_CODE: if(ligado){setColor(PINK_DARK_COLOR);} break;
+    case YELLOW_CODE: if(ligado){setColor(YELLOW_COLOR);} break;
+    case BLUE_BABY_CODE: if(ligado){setColor(BLUE_BABY_COLOR);} break;
+    case PINK_CODE: if(ligado){setColor(PINK_COLOR);} break;
+    case FLASH_CODE: if(ligado){flash();} break;
+    case STROBE_CODE: if(ligado){strobe();} break;
+    case FADE_CODE: if(ligado){fade();} break;
+    case SMOOTH_CODE: if(ligado){crossFade();} break;
   }
 }
 
@@ -204,6 +211,7 @@ void setColor(long colors[]) {
   currentColors[0] = colors[0];
   currentColors[1] = colors[1];
   currentColors[2] = colors[2];
+  sendColor();
 }
 
 // calculate the intensity and send the current color out via the output pins
@@ -544,10 +552,10 @@ void setPatamar(int red, int green, int blue){
   analogWrite(patamarRed,red);
   //Serial.print("red ");
   //Serial.println(red);
-  analogWrite(patamarRed,green);
+  analogWrite(patamarGreen,green);
   //Serial.print("green ");
   //Serial.println(green);
-  analogWrite(patamarRed,blue);
+  analogWrite(patamarBlue,blue);
   //Serial.print("blue ");
   //Serial.println(blue);
 }
@@ -555,6 +563,7 @@ void setPatamar(int red, int green, int blue){
 
 void setColorAllSteps(int red, int green, int blue){
 
+//MMM      Serial.println("Set all steps");
   //seta a posição mapeada (0 a 47) para cada degrau
   for(int j=0;j<16;j++){
       setIntensity(degraus[j][0],red);
@@ -566,8 +575,8 @@ void setColorAllSteps(int red, int green, int blue){
       setIntensity(degraus[j][2],blue);
       //Serial.print(" blue: ");
       //Serial.println(degraus[j][2]);
-      Serial.print("aqui: ");
-      Serial.println(map(red,0,4095,0,255));
+      //Serial.print("aqui: ");
+      //Serial.println(map(red,0,4095,0,255));
       setPatamar(map(red,0,4095,0,255),map(green,0,4095,0,255),map(blue,0,4095,0,255));
       
    
@@ -629,12 +638,14 @@ void subirEscada(){
     delay(100);
     Serial.print(".");
   }
-  for(int i=0;i<160;i++){
+  
+  Serial.println("16 sec...");
+  for(int i=0;i<16;i++){
     if(findCode())
       return;
-    Serial.println("16 sec...");
-    delay(100);
+    delay(1000);
   }
+  
   for(int j=15;j>=0;j--){
     setIntensity(degraus[j][0],0);
     setIntensity(degraus[j][1],0);
@@ -647,7 +658,7 @@ void subirEscada(){
       return;
     delay(100);
   }
-  desligarFonte();
+  //desligarFonte();
 }
 
 void ligarFonte(){
@@ -657,27 +668,90 @@ void desligarFonte(){
   digitalWrite(relePin,HIGH);
 }
 
+void efeito_ligando1(){
+
+  for(int i=0;i<3;i++){
+    setColorAllSteps(4095,4095,4095);
+    delay(100);
+    setColorAllSteps(0,0,0);
+    delay(100);
+  }
+  
+}
+
+void efeito_desligando(){
+
+  for(int i=1000;i>=0;i=i-10){
+    setColorAllSteps(i,0,0);
+    delay(2);
+  }
+  setColor(BLACK_COLOR);
+  
+}
+
+
+void efeito_ligando2(){
+  for(int j=0;j<16;j++){
+    setIntensity(degraus[j][0],4095);
+    setIntensity(degraus[j][1],4095);
+    setIntensity(degraus[j][2],4095);
+    delay(25);
+    setIntensity(degraus[j][0],0);
+    setIntensity(degraus[j][1],0);
+    setIntensity(degraus[j][2],0);
+  }
+  for(int j=14;j>=0;j--){
+    setIntensity(degraus[j][0],4095);
+    setIntensity(degraus[j][1],4095);
+    setIntensity(degraus[j][2],4095);
+    delay(25);
+    setIntensity(degraus[j][0],0);
+    setIntensity(degraus[j][1],0);
+    setIntensity(degraus[j][2],0);
+  }
+}
+
 // check for a code from the remote every 100 milliseconds
 void loop() {
-  currentMillis = millis();
-  sensorValue = analogRead(sensorPin);
-  patamarValue = digitalRead(patamar);
-  Serial.print("sensor: ");
-  Serial.println(sensorValue);
-  //Serial.println(patamarValue);
-  if(patamarValue == 1)
-    setPatamar(255,255,255);
-  else
-    setPatamar(0,0,0);
-    
-  if(sensorValue < 500){
-    ligarFonte();
-    subirEscada();
-  }
-  else if (currentMillis - previousMillis >= 100) {
-    previousMillis = currentMillis;
-    findCode();
-  }
-  //mapear(); //chame essa funcao para descobrir qual cor esta em cada degrau
 
+  patamarValue = digitalRead(patamar);
+  patamarValue = digitalRead(patamar);
+  patamarValue = digitalRead(patamar);
+  //Serial.print("sensor: ");
+  //Serial.println(sensorValue);
+  //Serial.println(patamarValue);
+  if(patamarValue == 1){
+    if(valorVelhoPatamar == 0){
+      setPatamar(255,255,255);
+      valorVelhoPatamar = 1;
+    }
+  }
+  else
+    if(valorVelhoPatamar == 1){
+      setPatamar(0,0,0);
+      valorVelhoPatamar = 0;
+    }
+        
+  if(ligado){
+    
+    if(!ligadoAnterior){ //Se antes estava desligado
+      efeito_ligando2();
+      ligadoAnterior = true;
+    }
+    
+    currentMillis = millis();
+    if (currentMillis - previousMillis >= 100) {
+      previousMillis = currentMillis;
+      
+      findCode(); //encontra o codigo do controle remoto
+      
+      sensorValue = analogRead(sensorPin);
+      if(sensorValue < 500){
+        //ligarFonte();
+        subirEscada();
+      }
+    }
+    //mapear(); //chame essa funcao para descobrir qual cor esta em cada degrau
+  }
+  else{ delay(10); findCode(); ligadoAnterior = false; }
 }
