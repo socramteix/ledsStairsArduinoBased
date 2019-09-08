@@ -601,6 +601,7 @@ void mapear(){
       else if(inChar == 'r'){setColorAllSteps(4095,0,0);}
       else if(inChar == 'g'){setColorAllSteps(0,4095,0);}
       else if(inChar == 'b'){setColorAllSteps(0,0,4095);}
+      else if(inChar == 'n'){setColor(BROWN_COLOR);}
       else if(inChar == 'a'){
         for (uint8_t servonum = 0; servonum < 16; servonum++) {
           board1.setPWM(servonum, 0, 4095);
@@ -714,13 +715,13 @@ void efeito_ligando2(){
 // check for a code from the remote every 100 milliseconds
 void loop() {
 
+  /*patamarValue = digitalRead(patamar);
   patamarValue = digitalRead(patamar);
-  patamarValue = digitalRead(patamar);
-  patamarValue = digitalRead(patamar);
+  patamarValue = digitalRead(patamar);*/
   //Serial.print("sensor: ");
   //Serial.println(sensorValue);
   //Serial.println(patamarValue);
-  if(patamarValue == 1){
+  /*if(patamarValue == 1){
     if(valorVelhoPatamar == 0){
       setPatamar(255,255,255);
       valorVelhoPatamar = 1;
@@ -731,10 +732,11 @@ void loop() {
       setPatamar(0,0,0);
       valorVelhoPatamar = 0;
     }
-        
+        */
   if(ligado){
     
     if(!ligadoAnterior){ //Se antes estava desligado
+      Serial.println("ligando");
       efeito_ligando2();
       ligadoAnterior = true;
     }
@@ -744,14 +746,14 @@ void loop() {
       previousMillis = currentMillis;
       
       findCode(); //encontra o codigo do controle remoto
-      
+      /*
       sensorValue = analogRead(sensorPin);
       if(sensorValue < 500){
         //ligarFonte();
         subirEscada();
-      }
+      }*/
     }
-    //mapear(); //chame essa funcao para descobrir qual cor esta em cada degrau
+    mapear(); //chame essa funcao para descobrir qual cor esta em cada degrau
   }
   else{ delay(10); findCode(); ligadoAnterior = false; }
 }
