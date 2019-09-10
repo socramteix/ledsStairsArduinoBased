@@ -19,12 +19,12 @@ int sensorValue;
 int sensorVcc = A0;
 int sensorPin = A1;
 int valorVelhoPatamar = 0;
-int recvPin = A8; // IR Receiver - Arduino Pin Number 8
+int recvPin = 11; // IR Receiver - Arduino Pin Number 8
 //int redPin = 8; // RED Output Pin
 //int greenPin = 3; // GREEN Output Pin
 //int bluePin = 4; // BLUE Output Pin
 int intensity = 10; // Intensity variable
-int speedValue = 5; // Speed Variable
+int speedValue = 5; // resumeSpeed Variable
 int currentColors[] = {0, 0, 0}; // Current Color outputed variable (black by default)
 bool customLoop = false; // Variable telling us we are in a custom animation loop
 unsigned long previousMillis = 0; // variable for the delay function
