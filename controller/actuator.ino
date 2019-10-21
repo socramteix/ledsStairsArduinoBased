@@ -81,3 +81,18 @@ void mapear(){
       }
   }
 }
+
+void setPatamar(int red, int green, int blue){
+  
+  //O VERDE ESTÁ BUGANDO TUDO, TEM Q ARRUMAR!!1
+  
+  analogWrite(patamarRed,red);
+  //Serial.print("red ");
+  //Serial.println(red);
+  analogWrite(patamarGreen,green);
+  //Serial.print("green ");
+  //Serial.println(green);
+  analogWrite(patamarBlue,blue);
+  //Serial.print("blue ");
+  //Serial.println(blue);
+}

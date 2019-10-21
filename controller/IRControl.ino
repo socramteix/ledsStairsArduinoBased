@@ -60,7 +60,11 @@ void interpretRemoteCode(long code) {
   long randomColor[3] = {random(256), random(256), random(256)};
   switch (code) {
     case ON_CODE: ligado = true; break;
-    case OFF_CODE: efeito_desligando(); ligado = false; break;
+    case OFF_CODE: if(ligado){
+      efeito_desligando2();
+      setColorAllSteps(0,0,0);
+      ligado = false;
+    } break;
     case INTENSITY_UP_CODE: if(ligado){raiseIntensity();} break;
     case INTENSITY_DN_CODE: if(ligado){lowerIntensity();} break;
     case RED_CODE: if(ligado){setColor(RED_COLOR);} break;
@@ -105,10 +109,11 @@ boolean findCode() {
       Serial.print("Code Found: ");
       Serial.println(results.value,HEX);
       interpretRemoteCode(results.value);
-//      if (results.value != FLASH_CODE && results.value != STROBE_CODE && results.value != FADE_CODE && results.value != SMOOTH_CODE) {
-//        customLoop = false;
-//        sendColor();
-//      }
+      if (ligado && results.value != FLASH_CODE && results.value != STROBE_CODE && results.value != FADE_CODE && results.value != SMOOTH_CODE) {
+        customLoop = false;
+        if(results.value != OFF_CODE && results.value != ON_CODE)
+          sendColor();
+      }
     } else {
       Serial.print("Invalid Code: ");
       Serial.println(results.value,HEX);

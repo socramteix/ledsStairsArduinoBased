@@ -59,7 +59,28 @@ void efeito_desligando(){
     setColorAllSteps(i,0,0);
     delay(2);
   }
-  setColor(BLACK_COLOR);
+  //setColor(BLACK_COLOR);
+  
+}
+
+void efeito_desligando2(){
+
+  int aux = 100;
+  int tim = 40;
+  setColorAllSteps(intensity*aux,intensity*aux,intensity*aux);
+  delay(tim);
+  setColorAllSteps(0,0,0);
+  delay(tim);
+  setColorAllSteps(intensity*aux,intensity*aux,intensity*aux);
+  delay(tim);
+  setColorAllSteps(0,0,0);
+  delay(tim);
+  setColorAllSteps(intensity*aux,intensity*aux,intensity*aux);
+  delay(tim);
+  setColorAllSteps(0,0,0);
+  delay(tim);
+  
+  //setColor(BLACK_COLOR);
   
 }
 
@@ -262,13 +283,19 @@ void fade() {
 
 
 void subirEscada(){
+
+  long mappedIntensity = map(intensity, 0, 10, 0, 4095);
+  long redComputed = map(currentColors[0], 0, 255, 0, mappedIntensity);
+  long greenComputed = map(currentColors[1], 0, 255, 0, mappedIntensity);
+  long blueComputed = map(currentColors[2], 0, 255, 0, mappedIntensity);
+  
   for(int j=0;j<16;j++){
-    setIntensity(degraus[j][0],4095);
-    setIntensity(degraus[j][1],4095);
-    setIntensity(degraus[j][2],4095);
+    setIntensity(degraus[j][0],redComputed);
+    setIntensity(degraus[j][1],greenComputed);
+    setIntensity(degraus[j][2],blueComputed);
     if(j == 7){
       delay(100);
-      setPatamar(255,255,255);
+      setPatamar(currentColors[0],currentColors[1],currentColors[2]);
     }
       
     if(findCode())
@@ -381,19 +408,4 @@ void crossFade() {
       }
     }
   }
-}
-
-void setPatamar(int red, int green, int blue){
-  
-  //O VERDE ESTÁ BUGANDO TUDO, TEM Q ARRUMAR!!1
-  
-  //analogWrite(patamarRed,red);
-  //Serial.print("red ");
-  //Serial.println(red);
-  //analogWrite(patamarGreen,green);
-  //Serial.print("green ");
-  //Serial.println(green);
-  //analogWrite(patamarBlue,blue);
-  //Serial.print("blue ");
-  //Serial.println(blue);
 }

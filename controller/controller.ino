@@ -2,23 +2,24 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
-int recvPin = 11; // IR Receiver - Arduino Pin Number 8
+int recvPin = A8; // IR Receiver - Arduino Pin Number 8
 bool ligado; //verifies if the system are on or off
 bool ligadoAnterior;
 bool customLoop = false; // Variable telling us we are in a custom animation loop
-int currentColors[] = {0, 0, 0}; // Current Color outputed variable (black by default)
+int currentColors[] = {255, 255, 255}; // Current Color outputed variable (black by default)
 int intensity = 10; // Intensity variable
 char inChar = '0';
 int cont=0;
 int mappedSpeed ;
 int speedValue = 5; // resumeSpeed Variable
-int patamarValue = 0;
-int patamar = 22;
-int patamarRed = 9;
-int patamarGreen = 10;
-int patamarBlue = 8;
+double patamarValue = 0.0;
+int patamar = 23;
+int patamarRed = 6;
+int patamarGreen = 7;
+int patamarBlue = 5;
 int sensorValue;
 int sensorPin = A1;
+int valorVelhoPatamar = 0;
 
 // called this way, it uses the default address 0x40
 //Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
@@ -52,7 +53,6 @@ uint8_t degraus[16][3] = {
 {31,44,43}};
 /*int relePin = 52;
 int sensorVcc = A0;
-int valorVelhoPatamar = 0;
 //int redPin = 8; // RED Output Pin
 //int greenPin = 3; // GREEN Output Pin
 //int bluePin = 4; // BLUE Output Pin
@@ -73,12 +73,12 @@ void setup() {
   Serial.begin(9600);
   irrecv.enableIRIn(); // Start the receiver
   /*pinMode(relePin  , OUTPUT);
-  pinMode(sensorPin, INPUT);
-  pinMode(sensorVcc, OUTPUT);
-  pinMode(patamar      , INPUT);*/
+  pinMode(sensorVcc, OUTPUT);*/
+  pinMode(patamar      , INPUT);
   pinMode(patamarRed   , OUTPUT);
   pinMode(patamarGreen , OUTPUT);
   pinMode(patamarBlue  , OUTPUT);
+  pinMode(sensorPin, INPUT);
 
   board1.begin();  // Analog servos run at ~60 Hz updates
   board2.begin();
@@ -107,26 +107,32 @@ void setup() {
 // check for a code from the remote every 100 milliseconds
 void loop() {
 
-  /*patamarValue = digitalRead(patamar);
   patamarValue = digitalRead(patamar);
-  patamarValue = digitalRead(patamar);*/
+  patamarValue += digitalRead(patamar);
+  patamarValue += digitalRead(patamar);
+  patamarValue = patamarValue/3.0;
   //Serial.print("sensor: ");
   //Serial.println(sensorValue);
   //Serial.println(patamarValue);
-  /*if(patamarValue == 1){
+  //Serial.print("aqui: ");
+  //Serial.println(patamarValue);
+  if(patamarValue == 1){
     if(valorVelhoPatamar == 0){
       setPatamar(255,255,255);
       valorVelhoPatamar = 1;
+      Serial.println("1");
     }
   }
-  else
+  else if(patamarValue == 0){
     if(valorVelhoPatamar == 1){
       setPatamar(0,0,0);
       valorVelhoPatamar = 0;
+      Serial.println("3");
     }
-        */
+  }
+        
   if(ligado){
-    
+    //Serial.println("aqui2"); 
     if(!ligadoAnterior){ //Se antes estava desligado
       Serial.println("ligando");
       efeito_ligando2();
@@ -151,5 +157,5 @@ void loop() {
     }
     //mapear(); //chame essa funcao para descobrir qual cor esta em cada degrau
   }
-  else{ delay(10); findCode(); ligadoAnterior = false; }
+  else{ Serial.println("aqui"); delay(10); findCode(); ligadoAnterior = false; }
 }
