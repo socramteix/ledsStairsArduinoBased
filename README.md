@@ -3,8 +3,9 @@ Em construção...
 Arduíno Based Project, of a Stair with landing that was completely illuminated with RGB leds.
 Projeto, utilizando Arduino, de uma escada residencial com patamar que foi totalmente iluminada com LEDs RGB.
 
-<p href="url"><img src="https://github.com/socramteix/ledsStairsArduinoBased/blob/master/stairs.gif" align="left" height="272" width="156" >
-<p href="url"><img src="https://github.com/socramteix/ledsStairsArduinoBased/blob/master/caixaPrincipal.jpeg" align="left" height="272" width="190" >
+<p><img src="https://github.com/socramteix/ledsStairsArduinoBased/blob/master/stairs.gif" align="left" height="272" width="156" >
+<img src="https://github.com/socramteix/ledsStairsArduinoBased/blob/master/caixaPrincipal.jpeg" align="left" height="272" width="190" >
+<img src="https://github.com/socramteix/ledsStairsArduinoBased/blob/master/controle%20remoto2.jpeg" align="center" height="272" width="180" ></p>
 
 Skills:
 Diferenciais:
@@ -28,5 +29,7 @@ https://www.youtube.com/watch?v=8Im0b3kO7Wk
 
 Video 2 - Conexões e circuito lógico - Conections and logical circuit</br>
 https://www.youtube.com/watch?v=ZgmIBGBdTQM
+
+<p><img src="https://github.com/socramteix/ledsStairsArduinoBased/blob/master/circuito%20simplificado.jpeg" align="center" height="300" width="300" ></p>
 
 Video 3 - Código fonte - Source code
